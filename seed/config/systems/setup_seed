@@ -1,0 +1,4 @@
+apt update
+apt install ansible wget git build-essential golang-go net-tools iputils-ping nano screen minicom vlan telnet tftp-hpa:armhf tftpd-hpa podman podman-docker podman-compose python3-setuptools ufw cron -y
+systemctl --user start podman.socket
+systemctl --user enable podman.socket

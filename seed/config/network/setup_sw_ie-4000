@@ -1,0 +1,67 @@
+en
+write erase
+erase startup-config
+reload
+
+en
+conf t
+hostname sw0
+ip domain-name container0.growbox.local
+username growbox privilege 15 secret grow
+access-list 10 permit 172.16.0.0 0.0.1.255
+access-list 10 deny any
+line con 0
+login local
+line vty 0 15
+access-class 10 in
+login local
+transport input all
+exec-timeout 5 0
+ip ssh version 2
+no logging console
+no logging monitor
+vlan 2
+name WAN1
+vlan 3
+name WAN2
+vlan 4
+name WAN3
+vlan 5
+name CARP_Sync
+vlan 6
+name Admin
+vlan 7
+name Growbox_Devices
+vlan 8
+name Zero_Touch
+interface vlan 6
+ip address 172.16.0.2 255.255.254.0
+ip access-group 10 in
+no shutdown
+ip default-gateway 172.16.0.1
+no ip http server
+no ip http secure-server
+interface GigabitEthernet1/1
+ no switchport mode trunk
+ description future_uplink
+ shut
+interface GigabitEthernet1/2
+ switchport mode trunk
+ description garden0
+ no shut
+interface GigabitEthernet1/3
+ switchport mode trunk
+ description seed0
+ no shut
+interface FastEthernet1/5
+ speed 100
+ duplex full
+ switch mode trunk
+ description ap0
+ no shut
+interface range FastEthernet1/6 - 12
+ shut
+exit
+exit
+write memory
+copy running-config startup-config

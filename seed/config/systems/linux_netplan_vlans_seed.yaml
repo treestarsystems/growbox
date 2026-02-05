@@ -1,0 +1,27 @@
+#Destination: /etc/netplan/growbow-vlans.yaml
+#Setup:
+# echo 8021q >> /etc/modules
+# netplan apply
+
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+  vlans:
+    vlan6:
+      id: 6
+      link: eth0
+      dhcp4: false
+      addresses: [172.16.0.20/23]
+    vlan7:
+      id: 7
+      link: eth0
+      dhcp4: false
+      addresses: [10.0.0.20/8]
+    vlan8:
+      id: 8
+      link: eth0
+      dhcp4: false
+      addresses: [192.168.0.20/26]
+

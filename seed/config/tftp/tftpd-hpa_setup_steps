@@ -1,0 +1,13 @@
+Commands:
+mkdir -p /opt/tftpboot/{AP-C9100,SW-IE4000}
+import files to tftp root dir
+chown -R tftp:tftp /opt/tftpboot
+chmod -R 777 /opt/tftpboot
+systemctl start tftpd-hpa
+systemctl enable tftpd-hpa
+systemctl status tftpd-hpa
+		
+Firewall Conf: Optional/Later
+ufw allow 69/udp
+ufw enable
+ufw status
