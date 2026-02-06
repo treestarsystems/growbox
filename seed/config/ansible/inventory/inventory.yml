@@ -6,6 +6,7 @@ all:
   ansible_connection: ssh
  children:
   network:all:
+   # Needs children declaration i think.
    hosts:
     r0:
      ansible_host: 172.16.0.1
