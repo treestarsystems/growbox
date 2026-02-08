@@ -1,3 +1,6 @@
+# cd repo root dir
+# ansible -i ./seed/config/ansible/inventory/inventory-default.yml all -m ping
+
 all:
  children:
   network:
@@ -9,15 +12,15 @@ all:
     ap0:
      ansible_host: 172.16.0.3
    children:
-    network:switch:
+    network_switch:
      hosts:
       sw0:
        ansible_host: 172.16.0.2
-    network:router:
+    network_router:
      hosts:
       r0:
        ansible_host: 172.16.0.1
-    network:ap:
+    network_ap:
      hosts:
       ap0:
        ansible_host: 172.16.0.3
@@ -36,3 +39,4 @@ all:
   ansible_connection: ssh
   ansible_ssh_common_args: '-o BindAddress=172.16.0.20 -o StrictHostKeyChecking=no'
   host_key_checking: False
+  ansible_python_interpreter: auto_silent
