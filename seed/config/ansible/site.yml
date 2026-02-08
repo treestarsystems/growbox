@@ -1,0 +1,8 @@
+---
+- name: Setup seed devices
+  hosts: seed
+  become: yes
+
+  roles:
+    - setup-seed
+

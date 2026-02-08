@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for setup-seed
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: "{{ apt_cache_valid_time }}"
+  retries: 3
+  delay: 5
+  register: apt_update
+  until: apt_update is success
+  tags:
+    - update
+    - packages
+
+- name: Install required packages
+  apt:
+    name: "{{ packages_list_setup_seed }}"
+    state: present
+  retries: 3
+  delay: 5
+  tags:
+    - packages
+
+- name: Display installation complete message
+  debug:
+    msg: "All packages have been installed successfully"
+  tags:
+    - packages

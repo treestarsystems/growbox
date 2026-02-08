@@ -1,0 +1,38 @@
+---
+- name: Install required packages on target systems
+  hosts: all
+  become: yes
+
+  vars:
+    packages_list:
+      - ansible
+      - wget
+      - git
+      - build-essential
+      - golang-go
+      - net-tools
+      - iputils-ping
+      - nano
+      - screen
+      - minicom
+      - vlan
+      - telnet
+      - tftp-hpa:armhf
+      - tftpd-hpa
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install all required packages
+      apt:
+        name: "{{ packages_list }}"
+        state: present
+      register: install_result
+
+    - name: Display installation result
+      debug:
+        msg: "Packages installed successfully"
+      when: install_result is success
