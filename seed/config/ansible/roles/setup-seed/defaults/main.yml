@@ -19,3 +19,7 @@ packages_list_setup_seed:
  - wget
 
 apt_cache_valid_time: 3600
+
+# Kernel modules to load
+kernel_modules:
+  - 8021q

@@ -28,3 +28,37 @@
     msg: "All packages have been installed successfully"
   tags:
     - packages
+
+---
+# tasks: enable vlan module
+
+- name: Enable 8021q (VLAN) kernel module
+  ansible.builtin.lineinfile:
+    path: /etc/modules
+    line: '8021q'
+    state: present
+    create: yes
+#    mode: '0644'
+  become: yes
+  tags:
+    - kernel
+    - vlan
+    - network
+
+- name: Load 8021q module immediately
+  community.general.modprobe:
+    name: 8021q
+    state: present
+  become: yes
+  tags:
+    - kernel
+    - vlan
+    - network
+
+- name: Verify 8021q module is loaded
+  ansible.builtin.shell: lsmod | grep 8021q
+  register: module_check
+  changed_when: false
+  failed_when: module_check.rc != 0
+  tags:
+    - verify

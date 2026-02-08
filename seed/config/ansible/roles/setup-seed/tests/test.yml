@@ -3,5 +3,15 @@
 - name: Test setup-seed role
   hosts: localhost
   remote_user: growbox
+
   roles:
-   - setup-seed
+   - roles/setup-seed
+
+  post_tasks:
+    - name: Check /etc/modules contains 8021q
+      ansible.builtin.shell: grep -q '^8021q$' /etc/modules
+      changed_when: false
+
+    - name: Verify 8021q module is loaded
+      ansible.builtin.shell: lsmod | grep -q 8021q
+      changed_when: false
