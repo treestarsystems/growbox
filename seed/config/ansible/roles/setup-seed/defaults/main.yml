@@ -15,6 +15,7 @@ packages_list_setup_seed:
  - telnet
  - tftp-hpa:armhf
  - tftpd-hpa
+ - ufw
  - vlan
  - wget
 

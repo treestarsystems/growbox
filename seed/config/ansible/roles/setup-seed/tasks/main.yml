@@ -1,146 +1,42 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# tasks file for setup-seed
+# Task: Install packages and configure services for seed setup
 
-- name: "Apt: Update apt cache"
-  ansible.builtin.apt:
-   update_cache: true
-   cache_valid_time: "{{ apt_cache_valid_time }}"
-  retries: 3
-  delay: 5
-  register: apt_update
-  until: apt_update is success
-  tags:
-   - update
-   - packages
-
-- name: "Apt: Install required packages"
-  ansible.builtin.apt:
-   name: "{{ packages_list_setup_seed }}"
-   state: present
-  retries: 3
-  delay: 5
+- name: Include apt package installation
+  ansible.builtin.include_tasks: system-apt-task-seed.yml
   tags:
    - packages
 
-- name: "Apt: Display installation complete message"
-  ansible.builtin.debug:
-   msg: "All packages have been installed successfully"
-  tags:
-   - packages
+# Task: Enable VLAN module
 
-# tasks: enable vlan module
-
-- name: "VLAN: Enable 8021q kernel module"
-  ansible.builtin.lineinfile:
-   path: /etc/modules
-   line: "8021q"
-   state: present
-   create: false
-  become: true
+- name: Include kernel module configuration
+  ansible.builtin.include_tasks: kernel-vlan-task-seed.yml
   tags:
    - kernel
-   - vlan
+
+- name: Include network configuration
+  ansible.builtin.include_tasks: network-vlan-task-seed.yml
+  tags:
    - network
 
-- name: "VLAN: Load 8021q module"
-  community.general.modprobe:
-   name: 8021q
-   state: present
-  become: true
-  tags:
-   - kernel
-   - vlan
-   - network
+# Task: Configure TFTP server
 
-- name: "VLAN: Verify 8021q module is loaded"
-  ansible.builtin.shell: set -o pipefail && lsmod | grep 8021q
-  register: module_check
-  changed_when: false
-  failed_when: module_check.rc != 0
+- name: Include TFTP server configuration
+  ansible.builtin.include_tasks: tftp-server-task-seed.yml
   tags:
-   - verify
-   - vlan
+   - tftp
 
-- name: "VLAN: Create VLAN based Netplan configuration"
-  ansible.builtin.copy:
-    content: |
-      network:
-        version: 2
-        ethernets:
-          eth0:
-            dhcp4: true
-        vlans:
-          vlan6:
-            id: 6
-            link: eth0
-            dhcp4: false
-            addresses: [172.16.0.20/23]
-          vlan7:
-            id: 7
-            link: eth0
-            dhcp4: false
-            addresses: [10.0.0.20/8]
-          vlan8:
-            id: 8
-            link: eth0
-            dhcp4: false
-            addresses: [192.168.0.20/26]
-    dest: /etc/netplan/growbox-vlans.yaml
-    owner: root
-    group: root
-    mode: '0600'
-    backup: yes
-  become: true
-  register: netplan_config
-  tags:
-    - network
-    - vlan
-    - netplan
-
-- name: "VLAN: Apply Netplan configuration"
-  ansible.builtin.command: netplan apply
-  become: yes
-  when: netplan_config.changed
-  tags:
-    - network
-    - netplan
-
-- name: "VLAN: Bring up VLAN 6 interface"
-  ansible.builtin.command: ip link set dev vlan6 up
-  become: yes
-  when: netplan_config.changed
-  failed_when: false
-  tags:
-    - network
-    - vlan
-
-- name: "VLAN: Display IP addresses"
-  ansible.builtin.command: ip addr show
-  become: yes
-  register: ip_output
-  changed_when: false
-  tags:
-    - network
-    - verify
-
-- name: "VLAN: Show IP configuration"
-  ansible.builtin.debug:
-    var: ip_output.stdout_lines
-  tags:
-    - network
-    - verify
-
-- name: Reboot the system
+# Task: Reboot if network configuration changed
+- name: "System: Reboot the system"
   ansible.builtin.reboot:
-    msg: "Reboot initiated by Ansible for VLAN configuration"
-    connect_timeout: 5
-    reboot_timeout: 600
-    pre_reboot_delay: 0
-    post_reboot_delay: 30
-    test_command: uptime
-  become: yes
+   msg: "Reboot initiated by Ansible for VLAN configuration"
+   connect_timeout: 5
+   reboot_timeout: 600
+   pre_reboot_delay: 0
+   post_reboot_delay: 30
+   test_command: uptime
+  become: true
   when: netplan_config.changed
   tags:
-    - network
-    - reboot
+   - network
+   - reboot

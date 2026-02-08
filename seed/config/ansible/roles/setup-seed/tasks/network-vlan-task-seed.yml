@@ -1,0 +1,70 @@
+# Task: Configure VLAN networking
+---
+- name: "VLAN: Create VLAN based Netplan configuration"
+  ansible.builtin.copy:
+   content: |
+    network:
+      version: 2
+      ethernets:
+        eth0:
+          dhcp4: true
+      vlans:
+        vlan6:
+          id: 6
+          link: eth0
+          dhcp4: false
+          addresses: [172.16.0.20/23]
+        vlan7:
+          id: 7
+          link: eth0
+          dhcp4: false
+          addresses: [10.0.0.20/8]
+        vlan8:
+          id: 8
+          link: eth0
+          dhcp4: false
+          addresses: [192.168.0.20/26]
+   dest: /etc/netplan/growbox-vlans.yaml
+   owner: root
+   group: root
+   mode: "0600"
+   backup: true
+  become: true
+  register: netplan_config
+  tags:
+   - network
+   - vlan
+   - netplan
+
+- name: "VLAN: Apply Netplan configuration"
+  ansible.builtin.command: netplan apply
+  become: true
+  when: netplan_config.changed
+  tags:
+   - network
+   - netplan
+
+- name: "VLAN: Bring up VLAN 6 interface"
+  ansible.builtin.command: ip link set dev vlan6 up
+  become: true
+  when: netplan_config.changed
+  failed_when: false
+  tags:
+   - network
+   - vlan
+
+- name: "VLAN: Display IP addresses"
+  ansible.builtin.command: ip addr show
+  become: true
+  register: ip_output
+  changed_when: false
+  tags:
+   - network
+   - verify
+
+- name: "VLAN: Show IP configuration"
+  ansible.builtin.debug:
+   var: ip_output.stdout_lines
+  tags:
+   - network
+   - verify
