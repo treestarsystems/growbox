@@ -1,8 +1,13 @@
+# Test:
+# cd seed/config/ansible
+# ansible-playbook -i ./inventory/inventory-default.yml ./site.yml --tags seed,setup
 ---
-- name: Setup seed devices
+- name: Setup seed device(s)
   hosts: seed
   become: yes
 
   roles:
-    - setup-seed
-
+    - role: setup-seed
+      tags:
+        - setup
+        - seed
