@@ -30,3 +30,6 @@ go.work.sum
 # Ignore all .bkp files
 *.bkp
 .DS_Store
+
+# Ansible
+inventory.yml
