@@ -1,5 +1,8 @@
+# Test:
 # cd repo root dir
-# ansible -i ./seed/config/ansible/inventory/inventory-default.yml all -m ping
+# ansible seed -i ./seed/config/ansible/inventory/inventory-default.yml -m ping
+# or
+# ansible all -i ./seed/config/ansible/inventory/inventory-default.yml -m ping
 
 all:
  children:
@@ -31,7 +34,7 @@ all:
   garden:
    hosts:
     garden0:
-     ansible_host: 172.16.0.20
+     ansible_host: 172.16.0.21
  vars:
   ansible_user: growbox
   ansible_ssh_pass: grow
