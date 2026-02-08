@@ -2,7 +2,7 @@
 ---
 # tasks file for setup-seed
 
-- name: Update apt cache
+- name: "Apt: Update apt cache"
   ansible.builtin.apt:
    update_cache: true
    cache_valid_time: "{{ apt_cache_valid_time }}"
@@ -14,7 +14,7 @@
    - update
    - packages
 
-- name: Install required packages
+- name: "Apt: Install required packages"
   ansible.builtin.apt:
    name: "{{ packages_list_setup_seed }}"
    state: present
@@ -23,7 +23,7 @@
   tags:
    - packages
 
-- name: Display installation complete message
+- name: "Apt: Display installation complete message"
   ansible.builtin.debug:
    msg: "All packages have been installed successfully"
   tags:
@@ -31,7 +31,7 @@
 
 # tasks: enable vlan module
 
-- name: Enable 8021q (VLAN) kernel module
+- name: "VLAN: Enable 8021q kernel module"
   ansible.builtin.lineinfile:
    path: /etc/modules
    line: "8021q"
@@ -43,7 +43,7 @@
    - vlan
    - network
 
-- name: Load 8021q module immediately
+- name: "VLAN: Load 8021q module"
   community.general.modprobe:
    name: 8021q
    state: present
@@ -53,10 +53,11 @@
    - vlan
    - network
 
-- name: Verify 8021q module is loaded
+- name: "VLAN: Verify 8021q module is loaded"
   ansible.builtin.shell: set -o pipefail && lsmod | grep 8021q
   register: module_check
   changed_when: false
   failed_when: module_check.rc != 0
   tags:
    - verify
+   - vlan

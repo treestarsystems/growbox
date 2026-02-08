@@ -5,4 +5,4 @@
   community.general.modprobe:
     name: 8021q
     state: present
-  become: yes
+  become: true

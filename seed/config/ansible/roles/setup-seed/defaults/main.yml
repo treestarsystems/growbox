@@ -22,4 +22,4 @@ apt_cache_valid_time: 3600
 
 # Kernel modules to load
 kernel_modules:
-  - 8021q
+ - 8021q
