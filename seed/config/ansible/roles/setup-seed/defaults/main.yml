@@ -24,3 +24,16 @@ apt_cache_valid_time: 3600
 # Kernel modules to load
 kernel_modules:
  - 8021q
+
+# TFTP configuration
+tftp_username: tftp
+tftp_directory: /opt/tftpboot
+tftp_address: "172.16.0.20:69"
+tftp_options: "--secure"
+
+tftp_subdirectories:
+ - AP-C9100
+ - SW-IE4000
+
+tftp_directory_mode: "0777"
+skip_reboot: false
