@@ -1,23 +1,23 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 galaxy_info:
-  author: treestarsystems
-  description: Install required development and networking packages
-  company: TreeStarSystems
+ author: treestarsystems
+ description: Install required development and networking packages
+ company: TreeStarSystems
 
-  license: MIT
+ license: MIT
 
-  min_ansible_version: 2.19
+ min_ansible_version: "2.19"
 
-  platforms:
-    - name: Debian
-      versions:
-        - trixie
+ platforms:
+  - name: Debian
+    versions:
+     - trixie
 
-  galaxy_tags:
-    - system
-    - packages
-    - development
-    - networking
+ galaxy_tags:
+  - system
+  - packages
+  - development
+  - networking
 
 dependencies: []

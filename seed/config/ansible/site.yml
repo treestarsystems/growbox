@@ -4,10 +4,10 @@
 ---
 - name: Setup seed device(s)
   hosts: seed
-  become: yes
+  become: true
 
   roles:
-    - role: setup-seed
-      tags:
-        - setup
-        - seed
+   - role: setup-seed
+     tags:
+      - setup
+      - seed

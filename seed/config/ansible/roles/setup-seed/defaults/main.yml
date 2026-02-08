@@ -1,21 +1,21 @@
-#SPDX-License-Identifier: MIT-0
+# SPDX-License-Identifier: MIT-0
 ---
 # defaults file for setup-seed
 
 packages_list_setup_seed:
-  - ansible
-  - wget
-  - git
-  - build-essential
-  - golang-go
-  - net-tools
-  - iputils-ping
-  - nano
-  - screen
-  - minicom
-  - vlan
-  - telnet
-  - tftp-hpa:armhf
-  - tftpd-hpa
+ - ansible
+ - build-essential
+ - git
+ - golang-go
+ - iputils-ping
+ - minicom
+ - nano
+ - net-tools
+ - screen
+ - telnet
+ - tftp-hpa:armhf
+ - tftpd-hpa
+ - vlan
+ - wget
 
 apt_cache_valid_time: 3600
