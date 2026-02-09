@@ -25,6 +25,7 @@
   ansible.builtin.include_tasks: service-tftp-task-seed.yml
   tags:
    - tftp
+
 # Task: Reboot if network configuration changed
 # - name: "System: Reboot the system"
 #   ansible.builtin.reboot:

@@ -28,7 +28,7 @@ kernel_modules:
 # TFTP configuration
 tftp_username: tftp
 tftp_directory: /opt/tftpboot
-tftp_address: "172.16.0.20:69"
+tftp_address: "{{ ansible_host | default('172.16.0.20') }}:69"
 tftp_options: "--secure"
 
 tftp_subdirectories:
