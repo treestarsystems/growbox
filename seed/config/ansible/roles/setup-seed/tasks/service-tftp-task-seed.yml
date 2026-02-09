@@ -71,7 +71,7 @@
 - name: "TFTP: Wait for TFTP service to be ready"
   ansible.builtin.wait_for:
    port: 69
-   host: {{ ansible_host | default('172.16.0.20') }}
+   host: {{ vlan6_address | ansible_host | default('172.16.0.20') }}
    timeout: 30
    delay: 2
   become: true

@@ -11,6 +11,7 @@ packages_list_setup_seed:
  - minicom
  - nano
  - net-tools
+ - p7zip-full
  - screen
  - telnet
  - tftp-hpa:armhf
@@ -25,10 +26,16 @@ apt_cache_valid_time: 3600
 kernel_modules:
  - 8021q
 
+# VLAN configuration
+primary_interface: eth0
+vlan6_address: "172.16.0.20"
+vlan7_address: "10.0.0.20"
+vlan8_address: "192.168.0.20"
+
 # TFTP configuration
 tftp_username: tftp
 tftp_directory: /opt/tftpboot
-tftp_address: "{{ ansible_host | default('172.16.0.20') }}:69"
+tftp_address: "{{ vlan6_address | ansible_host | default('172.16.0.20') }}:69"
 tftp_options: "--secure"
 
 tftp_subdirectories:
