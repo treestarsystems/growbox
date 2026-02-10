@@ -37,6 +37,7 @@
   # changed_when: setup_seed_netplan_config.changed
   tags:
    - network
+   - vlan
    - netplan
 
 - name: "VLAN: Bring up VLAN 6 interface"
@@ -48,6 +49,7 @@
   tags:
    - network
    - vlan
+   - netplan
 
 - name: "VLAN: Display IP addresses"
   ansible.builtin.command: ip addr show
@@ -56,6 +58,8 @@
   changed_when: false
   tags:
    - network
+   - vlan
+   - netplan
    - verify
 
 - name: "VLAN: Show IP configuration"
@@ -64,3 +68,5 @@
   tags:
    - network
    - verify
+   - vlan
+   - netplan
