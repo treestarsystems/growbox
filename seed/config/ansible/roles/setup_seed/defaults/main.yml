@@ -2,7 +2,7 @@
 ---
 # defaults file for setup-seed
 
-packages_list_setup_seed:
+setup_seed_packages_list:
  - ansible
  - build-essential
  - git
@@ -22,36 +22,32 @@ packages_list_setup_seed:
  - vlan
  - wget
 
-apt_cache_valid_time: 3600
+setup_seed_apt_cache_valid_time: 3600
 
 # Kernel modules to load
-kernel_modules:
+setup_seed_kernel_modules:
  - 8021q
 
 # VLAN configuration
-primary_interface: eth0
-vlan6_address: "172.16.0.20"
-vlan7_address: "10.0.0.20"
-vlan8_address: "192.168.0.20"
+setup_seed_primary_interface: eth0
+setup_seed_vlan6_address: "172.16.0.20"
+setup_seed_vlan7_address: "10.0.0.20"
+setup_seed_vlan8_address: "192.168.0.20"
 
 # TFTP configuration
-tftp_username: tftp
-tftp_directory: /opt/tftpboot
-tftp_address: "{{ vlan6_address | default('172.16.0.20') }}:69"
-tftp_options: "--secure"
+setup_seed_tftp_username: tftp
+setup_seed_tftp_directory: /opt/tftpboot
+setup_seed_tftp_address: "{{ vlan6_address | default('172.16.0.20') }}:69"
+setup_seed_tftp_options: "--secure"
 
-#tftp_subdirectories:
-# - AP-C9100
-# - SW-IE4000
+setup_seed_tftp_directory_mode: "0777"
+setup_seed_skip_reboot: false
 
-tftp_directory_mode: "0777"
-skip_reboot: false
+setup_seed_firmware_prompt_user: true
+setup_seed_firmware_auto_extract: false
+setup_seed_firmware_archive_name: tftp-network-firmware.7z
+setup_seed_firmware_archive_path: "{{ role_path }}/files/{{ setup_seed_firmware_archive_name }}"
 
-firmware_prompt_user: true
-firmware_auto_extract: false
-firmware_archive_name: tftp-network-firmware.7z
-firmware_archive_path: "{{ role_path }}/files/{{ firmware_archive_name }}"
-
-firmware_directories:
-  - AP-C9100
-  - SW-IE4000
+setup_seed_firmware_directories:
+ - AP-C9100
+ - SW-IE4000

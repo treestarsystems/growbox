@@ -3,256 +3,240 @@
 
 - name: "Firmware: Check if firmware files already exist"
   ansible.builtin.stat:
-    path: "{{ tftp_directory }}/{{ item }}"
-  loop: "{{ firmware_directories }}"
-  register: firmware_check
-  become: yes
+   path: "{{ setup_seed_tftp_directory }}/{{ item }}"
+  loop: "{{ setup_seed_firmware_directories }}"
+  register: setup_seed_firmware_check
+  become: true
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Display existing firmware status"
   ansible.builtin.debug:
-    msg: "{{ item.item }}: {{ 'exists' if item.stat.exists else 'missing' }}"
-  loop: "{{ firmware_check.results }}"
+   msg: "{{ item.item }}: {{ 'exists' if item.stat.exists else 'missing' }}"
+  loop: "{{ setup_seed_firmware_check.results }}"
   loop_control:
-    label: "{{ item.item }}"
+   label: "{{ item.item }}"
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Prompt user to extract firmware archive"
   ansible.builtin.pause:
-    prompt: "Do you want to extract firmware files to {{ tftp_directory }}? (yes/no)"
-  register: extract_prompt
-  when: firmware_prompt_user | default(true) | bool
+   prompt: "Do you want to extract firmware files to {{ setup_seed_tftp_directory }}? (yes/no)"
+  register: setup_seed_extract_prompt
+  when: setup_seed_firmware_prompt_user | default(true) | bool
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Set extraction decision"
   ansible.builtin.set_fact:
-    extract_firmware: "{{ extract_prompt.user_input | default('false') | bool if firmware_prompt_user | default(true) | bool else firmware_auto_extract | default(false) | bool }}"
+   setup_seed_extract_firmware: >-
+    {{
+      (setup_seed_extract_prompt.user_input | default('false') | bool)
+      if (setup_seed_firmware_prompt_user | default(true) | bool)
+      else
+      (setup_seed_firmware_auto_extract | default(false) | bool)
+    }}
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Display extraction decision"
   ansible.builtin.debug:
-    msg: "Firmware extraction: {{ 'enabled' if extract_firmware else 'skipped' }}"
+   msg: "Firmware extraction: {{ 'enabled' if setup_seed_extract_firmware else 'skipped' }}"
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Initialize Git LFS in repository"
   ansible.builtin.command:
-    cmd: git lfs install
-    chdir: "{{ playbook_dir }}"
+   cmd: git lfs install
+   chdir: "{{ playbook_dir }}"
   changed_when: false
   delegate_to: localhost
-  run_once: yes
-  when: extract_firmware | bool
+  run_once: true
+  when: setup_seed_extract_firmware | bool
   tags:
-    - firmware
-    - extract
-    - lfs
+   - firmware
+   - extract
+   - lfs
 
 - name: "Firmware: Pull Git LFS files"
   ansible.builtin.command:
-    cmd: git lfs pull
-    chdir: "{{ playbook_dir }}"
-  register: lfs_pull
-  changed_when: "'Downloading' in lfs_pull.stderr"
+   cmd: git lfs pull
+   chdir: "{{ playbook_dir }}"
+  register: setup_seed_lfs_pull
+  changed_when: "'Downloading' in setup_seed_lfs_pull.stderr"
   delegate_to: localhost
-  run_once: yes
-  when: extract_firmware | bool
+  run_once: true
+  when: setup_seed_extract_firmware | bool
   tags:
-    - firmware
-    - extract
-    - lfs
+   - firmware
+   - extract
+   - lfs
 
 - name: "Firmware: Check if 7zip archive exists"
   ansible.builtin.stat:
-    path: "{{ firmware_archive_path }}"
-  register: archive_stat
+   path: "{{ setup_seed_firmware_archive_path }}"
+  register: setup_seed_archive_stat
   delegate_to: localhost
-  run_once: yes
+  run_once: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Fail if archive not found"
   ansible.builtin.fail:
-    msg: "Firmware archive not found at {{ firmware_archive_path }}"
+   msg: "Firmware archive not found at {{ setup_seed_firmware_archive_path }}"
   when:
-    - extract_firmware | bool
-    - not archive_stat.stat.exists
+   - setup_seed_extract_firmware | bool
+   - not setup_seed_archive_stat.stat.exists
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Prompt for 7zip archive password"
   ansible.builtin.pause:
-    prompt: "Enter password for firmware archive"
-    echo: no
-  register: archive_password_prompt
-  when: extract_firmware | bool
-  no_log: yes
+   prompt: "Enter password for firmware archive"
+   echo: false
+  register: setup_seed_archive_password_prompt
+  when: setup_seed_extract_firmware | bool
+  no_log: true
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Set archive password"
   ansible.builtin.set_fact:
-    archive_password: "{{ archive_password_prompt.user_input }}"
+   setup_seed_archive_password: "{{ setup_seed_archive_password_prompt.user_input }}"
   when: extract_firmware | bool
-  no_log: yes
+  no_log: true
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Copy 7zip archive to target"
   ansible.builtin.copy:
-    src: "{{ firmware_archive_path }}"
-    dest: "/tmp/{{ firmware_archive_name }}"
-    mode: '0600'
-  become: yes
+   src: "{{ setup_seed_firmware_archive_path }}"
+   dest: "/tmp/{{ setup_seed_firmware_archive_name }}"
+   mode: "0600"
+  become: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - extract
-
-#- name: "Firmware: Test archive password"
-#  ansible.builtin.command:
-#    cmd: "7z t -p{{ archive_password }} /tmp/{{ firmware_archive_name }}"
-#  register: archive_test
-#  become: yes
-#  when: extract_firmware | bool
-#  changed_when: false
-#  failed_when: archive_test.rc != 0
-#  no_log: yes
-#  tags:
-#    - firmware
-#    - extract
-
-#- name: "Firmware: Extract 7zip archive to TFTP directory"
-#  ansible.builtin.command:
-#    cmd: "7z x -p{{ archive_password }} -o{{ tftp_directory }} /tmp/{{ firmware_archive_name }} -y"
-#  become: yes
-#  when: extract_firmware | bool
-#  register: extract_result
-#  no_log: yes
-#  tags:
-#    - firmware
-#    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Extract 7zip archive with retry"
+  when: setup_seed_extract_firmware | bool
+
+  tags:
+   - firmware
+   - extract
+
   block:
-    - name: "Firmware: Attempt extraction"
-      ansible.builtin.command:
-        cmd: "7z x -p{{ archive_password }} -o{{ tftp_directory }} /tmp/{{ firmware_archive_name }} -y"
-      become: yes
-      register: extract_attempt
-      no_log: yes
+   - name: "Firmware: Attempt extraction"
+     ansible.builtin.command:
+      cmd: "7z x -p{{ setup_seed_archive_password }} -o{{ setup_seed_tftp_directory }} /tmp/{{ setup_seed_firmware_archive_name }} -y"
+     become: true
+     register: setup_seed_extract_attempt
+     no_log: true
 
   rescue:
-    - name: "Firmware: Extraction failed - incorrect password?"
-      ansible.builtin.debug:
-        msg: "Extraction failed. Please check the password."
+   - name: "Firmware: Extraction failed - incorrect password?"
+     ansible.builtin.debug:
+      msg: "Extraction failed. Please check the password."
 
-    - name: "Firmware: Re-prompt for password"
-      ansible.builtin.pause:
-        prompt: "Archive password was incorrect. Please re-enter"
-        echo: no
-      register: retry_password
-      no_log: yes
+   - name: "Firmware: Re-prompt for password"
+     ansible.builtin.pause:
+      prompt: "Archive password was incorrect. Please re-enter"
+      echo: false
+     register: setup_seed_retry_password
+     no_log: true
 
-    - name: "Firmware: Retry extraction"
-      ansible.builtin.command:
-        cmd: "7z x -p{{ retry_password.user_input }} -o{{ tftp_directory }} /tmp/{{ firmware_archive_name }} -y"
-      become: yes
-      no_log: yes
-
-  when: extract_firmware | bool
-  tags:
-    - firmware
-    - extract
+   - name: "Firmware: Retry extraction"
+     ansible.builtin.command:
+      cmd: "7z x -p{{ setup_seed_retry_password.user_input }} -o{{ setup_seed_tftp_directory }} /tmp/{{ setup_seed_firmware_archive_name }} -y"
+     become: true
+     no_log: true
+     changed_when: true
 
 - name: "Firmware: Set ownership on extracted files"
   ansible.builtin.file:
-    path: "{{ tftp_directory }}"
-    owner: "{{ tftp_username }}"
-    group: "{{ tftp_username }}"
-    recurse: yes
-  become: yes
+   path: "{{ setup_seed_tftp_directory }}"
+   owner: "{{ setup_seed_tftp_username }}"
+   group: "{{ setup_seed_tftp_username }}"
+   recurse: true
+  become: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Set permissions on extracted directories"
   ansible.builtin.file:
-    path: "{{ tftp_directory }}/{{ item }}"
-    mode: '0777'
-    state: directory
-    recurse: yes
-  loop: "{{ firmware_directories }}"
-  become: yes
+   path: "{{ setup_seed_tftp_directory }}/{{ item }}"
+   mode: "0777"
+   state: directory
+   recurse: true
+  loop: "{{ setup_seed_firmware_directories }}"
+  become: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - extract
+   - firmware
+   - extract
 
 - name: "Firmware: Remove temporary archive"
   ansible.builtin.file:
-    path: "/tmp/{{ firmware_archive_name }}"
-    state: absent
-  become: yes
+   path: "/tmp/{{ setup_seed_firmware_archive_name }}"
+   state: absent
+  become: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - extract
-    - cleanup
+   - firmware
+   - extract
+   - cleanup
 
 - name: "Firmware: Verify extracted directories"
   ansible.builtin.stat:
-    path: "{{ tftp_directory }}/{{ item }}"
-  loop: "{{ firmware_directories }}"
-  register: firmware_verify
-  become: yes
+   path: "{{ setup_seed_tftp_directory }}/{{ item }}"
+  loop: "{{ setup_seed_firmware_directories }}"
+  register: setup_seed_firmware_verify
+  become: true
   when: extract_firmware | bool
   tags:
-    - firmware
-    - verify
+   - firmware
+   - verify
 
 - name: "Firmware: Display extraction results"
   ansible.builtin.debug:
-    msg: "{{ item.item }}: {{ 'OK' if item.stat.exists else 'FAILED' }}"
-  loop: "{{ firmware_verify.results }}"
+   msg: "{{ item.item }}: {{ 'OK' if item.stat.exists else 'FAILED' }}"
+  loop: "{{ setup_seed_firmware_verify.results }}"
   loop_control:
-    label: "{{ item.item }}"
+   label: "{{ item.item }}"
   when: extract_firmware | bool
   tags:
-    - firmware
-    - verify
+   - firmware
+   - verify
 
 - name: "Firmware: List extracted files"
   ansible.builtin.command:
-    cmd: "ls -lah {{ tftp_directory }}/{{ item }}"
-  loop: "{{ firmware_directories }}"
-  register: firmware_list
-  become: yes
+   cmd: "ls -lah {{ setup_seed_tftp_directory }}/{{ item }}"
+  loop: "{{ setup_seed_firmware_directories }}"
+  register: setup_seed_firmware_list
+  become: true
   when: extract_firmware | bool
   changed_when: false
   tags:
-    - firmware
-    - verify
+   - firmware
+   - verify
 
 - name: "Firmware: Display extracted file listing"
   ansible.builtin.debug:
-    var: firmware_list.results
-  when: extract_firmware | bool
+   var: setup_seed_firmware_list.results
+  when: setup_seed_extract_firmware | bool
   tags:
-    - firmware
-    - verify
+   - firmware
+   - verify

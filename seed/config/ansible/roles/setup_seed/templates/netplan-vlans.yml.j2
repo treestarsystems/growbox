@@ -1,0 +1,22 @@
+# /etc/netplan/growbox-vlans.yaml: Generated via Ansible using template
+network:
+  version: 2
+  ethernets:
+    {{ setup_seed_primary_interface }}:
+      dhcp4: true
+  vlans:
+    vlan6:
+      id: 6
+      link: {{ setup_seed_primary_interface }}
+      dhcp4: false
+      addresses: [{{ setup_seed_vlan6_address }}/23]
+    vlan7:
+      id: 7
+      link: {{ setup_seed_primary_interface }}
+      dhcp4: false
+      addresses: [{{ setup_seed_vlan7_address }}/8]
+    vlan8:
+      id: 8
+      link: {{ setup_seed_primary_interface }}
+      dhcp4: false
+      addresses: [{{ setup_seed_vlan8_address }}/26]

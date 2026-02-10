@@ -24,9 +24,9 @@
 
 - name: "VLAN: Verify 8021q module is loaded"
   ansible.builtin.shell: set -o pipefail && lsmod | grep 8021q
-  register: module_check
+  register: setup_seed_module_check
   changed_when: false
-  failed_when: module_check.rc != 0
+  failed_when: setup_seed_module_check.rc != 0
   tags:
    - verify
    - vlan

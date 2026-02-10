@@ -1,36 +1,29 @@
 # Task: Configure VLAN networking
 ---
-- name: "VLAN: Create VLAN based Netplan configuration"
-  ansible.builtin.copy:
-   content: |
-    network:
-      version: 2
-      ethernets:
-        {{ primary_interface }}:
-          dhcp4: true
-      vlans:
-        vlan6:
-          id: 6
-          link: {{ primary_interface }}
-          dhcp4: false
-          addresses: [{{ vlan6_address }}/23]
-        vlan7:
-          id: 7
-          link: {{ primary_interface }}
-          dhcp4: false
-          addresses: [{{ vlan7_address }}/8]
-        vlan8:
-          id: 8
-          link: {{ primary_interface }}
-          dhcp4: false
-          addresses: [{{ vlan8_address }}/26]
+# - name: "VLAN: Create VLAN based Netplan configuration"
+#   ansible.builtin.template:
+#    src: netplan-vlans.yml.j2
+#    dest: /etc/netplan/growbox-vlans.yaml
+#    owner: root
+#    group: root
+#    mode: "0600"
+#    backup: true
+#   become: true
+#   register: setup_seed_netplan_config
+#   tags:
+#    - network
+#    - vlan
+#    - netplan
+
+- name: "VLAN: Create Netplan VLAN configuration"
+  ansible.builtin.template:
+   src: netplan-vlans.yaml.j2
    dest: /etc/netplan/growbox-vlans.yaml
    owner: root
    group: root
    mode: "0600"
    backup: true
   become: true
-  register: netplan_config
   tags:
    - network
    - vlan
@@ -39,8 +32,9 @@
 - name: "VLAN: Apply Netplan configuration"
   ansible.builtin.command: netplan apply
   become: true
-  when: netplan_config.changed
-  changed_when: netplan_config.changed
+  notify: Apply netplan
+  # when: setup_seed_netplan_config.changed
+  # changed_when: setup_seed_netplan_config.changed
   tags:
    - network
    - netplan
@@ -48,7 +42,7 @@
 - name: "VLAN: Bring up VLAN 6 interface"
   ansible.builtin.command: ip link set dev vlan6 up
   become: true
-  when: netplan_config.changed
+  when: setup_seed_netplan_config.changed
   changed_when: false
   failed_when: false
   tags:
@@ -58,7 +52,7 @@
 - name: "VLAN: Display IP addresses"
   ansible.builtin.command: ip addr show
   become: true
-  register: ip_output
+  register: setup_seed_ip_output
   changed_when: false
   tags:
    - network
@@ -66,7 +60,7 @@
 
 - name: "VLAN: Show IP configuration"
   ansible.builtin.debug:
-   var: ip_output.stdout_lines
+   var: setup_seed_ip_output.stdout_lines
   tags:
    - network
    - verify

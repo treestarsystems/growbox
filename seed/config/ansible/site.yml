@@ -7,7 +7,7 @@
   become: true
 
   roles:
-   - role: setup-seed
+   - role: setup_seed
      tags:
       - setup
       - seed

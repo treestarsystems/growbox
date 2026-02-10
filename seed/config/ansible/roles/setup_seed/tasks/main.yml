@@ -29,8 +29,7 @@
 - name: Include firmware extraction
   ansible.builtin.include_tasks: firmware-extract-task-seed.yml
   tags:
-    - firmware
-
+   - firmware
 # Task: Reboot if network configuration changed
 # - name: "System: Reboot the system"
 #   ansible.builtin.reboot:

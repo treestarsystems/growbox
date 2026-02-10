@@ -9,18 +9,18 @@
    mode: "0644"
    backup: true
   become: true
-  register: tftp_config
+  register: setup_seed_tftp_config
   tags:
    - tftp
    - config
 
 - name: "TFTP: Create main TFTP directory"
   ansible.builtin.file:
-   path: "{{ tftp_directory }}"
+   path: "{{ setup_seed_tftp_directory }}"
    state: directory
-   owner: "{{ tftp_username }}"
-   group: "{{ tftp_username }}"
-   mode: "{{ tftp_directory_mode }}"
+   owner: "{{ setup_seed_tftp_username }}"
+   group: "{{ setup_seed_tftp_username }}"
+   mode: "{{ setup_seed_tftp_directory_mode }}"
   become: true
   tags:
    - tftp
@@ -50,41 +50,41 @@
    name: tftpd-hpa
    state: restarted
   become: true
-  when: tftp_config.changed
+  when: setup_seed_tftp_config.changed
   tags:
    - tftp
    - service
 
 - name: "TFTP: Wait until tftpd-hpa is active"
   ansible.builtin.shell: systemctl is-active tftpd-hpa
-  register: tftp_active
-  become: yes
+  register: setup_seed_tftp_active
+  become: true
   changed_when: false
   retries: 10
   delay: 3
-  until: tftp_active.stdout == "active"
+  until: setup_seed_tftp_active.stdout == "active"
   tags:
-    - tftp
-    - verify
+   - tftp
+   - verify
 
 - name: "TFTP: Display listening status"
   ansible.builtin.debug:
-    msg: "TFTP is listening: {{ tftp_active.stdout }}"
+   msg: "TFTP is listening: {{ setup_seed_tftp_active.stdout }}"
   tags:
-    - tftp
-    - verify
+   - tftp
+   - verify
 
 - name: "TFTP: Verify TFTP directories exist"
   ansible.builtin.stat:
-   path: "{{ tftp_directory }}"
-  register: tftp_dir_check
+   path: "{{ setup_seed_tftp_directory }}"
+  register: setup_seed_tftp_dir_check
   tags:
    - tftp
    - verify
 
 - name: "TFTP: Display TFTP directory status"
   ansible.builtin.debug:
-   msg: "Directory {{ tftp_directory }} exists: {{ tftp_dir_check.stat.exists }}"
+   msg: "Directory {{ setup_seed_tftp_directory }} exists: {{ setup_seed_tftp_dir_check.stat.exists }}"
   tags:
    - tftp
    - verify
@@ -99,7 +99,7 @@
    test_command: uptime
   become: true
   when:
-   - tftp_config.changed
+   - setup_seed_tftp_config.changed
    - not skip_reboot | bool
   tags:
    - reboot
@@ -111,7 +111,7 @@
    delay: 5
    timeout: 300
   when:
-   - tftp_config.changed
+   - setup_seed_tftp_config.changed
    - not skip_reboot | bool
   tags:
    - reboot
@@ -120,16 +120,16 @@
   ansible.builtin.systemd:
    name: tftpd-hpa
   become: true
-  register: tftp_post_reboot
-  when: tftp_config.changed
+  register: setup_seed_tftp_post_reboot
+  when: setup_seed_tftp_config.changed
   tags:
    - tftp
    - verify
 
 - name: "TFTP: Display TFTP service status after reboot"
   ansible.builtin.debug:
-   msg: "TFTP service is {{ tftp_post_reboot.status.ActiveState }} after reboot"
-  when: tftp_config.changed
+   msg: "TFTP service is {{ setup_seed_tftp_post_reboot.status.ActiveState }} after reboot"
+  when: setup_seed_tftp_config.changed
   tags:
    - tftp
    - verify
