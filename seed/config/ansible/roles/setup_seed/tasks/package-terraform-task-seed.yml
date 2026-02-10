@@ -10,8 +10,7 @@
 - name: "Terraform: Set download URL"
   ansible.builtin.set_fact:
    setup_seed_terraform_url: >-
-    https://releases.hashicorp.com/terraform/{{ setup_seed_terraform_version }}/
-    terraform_{{ setup_seed_terraform_version }}_linux_{{ setup_seed_terraform_arch }}.zip
+    https://releases.hashicorp.com/terraform/{{ setup_seed_terraform_version }}/terraform_{{ setup_seed_terraform_version }}_linux_{{ setup_seed_terraform_arch }}.zip
   tags:
    - terraform
 
@@ -51,7 +50,7 @@
    dest: /tmp/terraform.zip
    mode: "0644"
   when: >
-   not terraform_binary.stat.exists or
+   not setup_seed_terraform_binary.stat.exists or
    setup_seed_terraform_force_install | default(false)
   tags:
    - terraform
