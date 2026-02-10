@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MIT-0
 ---
-# handlers file for roles/setup-seed
+# handlers file for roles/setup_seed
 - name: Load 8021q module
   community.general.modprobe:
-    name: 8021q
-    state: present
+   name: 8021q
+   state: present
   become: true

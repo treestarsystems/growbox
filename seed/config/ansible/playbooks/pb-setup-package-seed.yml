@@ -6,19 +6,21 @@
   vars:
    packages_list:
     - ansible
-    - wget
-    - git
     - build-essential
+    - git
     - golang-go
-    - net-tools
     - iputils-ping
-    - nano
-    - screen
     - minicom
-    - vlan
+    - nano
+    - net-tools
+    - p7zip-full
+    - screen
     - telnet
     - tftp-hpa:armhf
     - tftpd-hpa
+    - ufw
+    - vlan
+    - wget
 
   tasks:
    - name: Update apt cache

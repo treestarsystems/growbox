@@ -6,24 +6,24 @@
     network:
       version: 2
       ethernets:
-        {{primary_interface}}:
+        {{ primary_interface }}:
           dhcp4: true
       vlans:
         vlan6:
           id: 6
-          link: {{primary_interface}}
+          link: {{ primary_interface }}
           dhcp4: false
-          addresses: [{{vlan6_address}}/23]
+          addresses: [{{ vlan6_address }}/23]
         vlan7:
           id: 7
-          link: {{primary_interface}}
+          link: {{ primary_interface }}
           dhcp4: false
-          addresses: [{{vlan7_address}}/8]
+          addresses: [{{ vlan7_address }}/8]
         vlan8:
           id: 8
-          link: {{primary_interface}}
+          link: {{ primary_interface }}
           dhcp4: false
-          addresses: [{{vlan8_address}}/26]
+          addresses: [{{ vlan8_address }}/26]
    dest: /etc/netplan/growbox-vlans.yaml
    owner: root
    group: root
@@ -40,6 +40,7 @@
   ansible.builtin.command: netplan apply
   become: true
   when: netplan_config.changed
+  changed_when: netplan_config.changed
   tags:
    - network
    - netplan
@@ -48,6 +49,7 @@
   ansible.builtin.command: ip link set dev vlan6 up
   become: true
   when: netplan_config.changed
+  changed_when: false
   failed_when: false
   tags:
    - network

@@ -40,6 +40,6 @@ all:
   ansible_ssh_pass: grow
   ansible_port: 22
   ansible_connection: ssh
-  ansible_ssh_common_args: '-o BindAddress=172.16.0.20 -o StrictHostKeyChecking=no'
-  host_key_checking: False
+  ansible_ssh_common_args: "-o BindAddress=172.16.0.20 -o StrictHostKeyChecking=no"
+  host_key_checking: false
   ansible_python_interpreter: auto_silent
