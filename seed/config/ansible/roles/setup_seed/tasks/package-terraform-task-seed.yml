@@ -30,8 +30,8 @@
 
 - name: "Terraform: Get current version if installed"
   ansible.builtin.command: /usr/local/bin/terraform version -json
-  register: current_version
-  when: terraform_binary.stat.exists
+  register: setup_seed_current_version
+  when: setup_seed_terraform_binary.stat.exists
   changed_when: false
   failed_when: false
   tags:
