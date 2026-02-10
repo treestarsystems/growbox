@@ -5,8 +5,10 @@
 setup_seed_packages_list:
  - ansible
  - build-essential
+ - curl
  - git
  - git-lfs
+ - gnupg
  - golang-go
  - iputils-ping
  - minicom
@@ -15,6 +17,7 @@ setup_seed_packages_list:
  - p7zip-full
  - p7zip-rar
  - screen
+ #  - software-properties-common
  - telnet
  - tftp-hpa:armhf
  - tftpd-hpa
@@ -51,3 +54,9 @@ setup_seed_firmware_archive_path: "{{ role_path }}/files/{{ setup_seed_firmware_
 setup_seed_firmware_directories:
  - AP-C9100
  - SW-IE4000
+
+# Terraform configuration
+setup_seed_terraform_arch_default: "" # Leave empty for the default "arm", or specify like "amd64" or "386"
+setup_seed_terraform_version_default: "" # Leave empty for latest, or specify like "1.7.0"
+setup_seed_terraform_enable_completion: true
+setup_seed_terraform_force_install: false

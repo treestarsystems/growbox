@@ -7,6 +7,13 @@
   tags:
    - packages
 
+# Task: Install terraform package
+- name: Include terraform package installation
+  ansible.builtin.include_tasks: package-terraform-task-seed.yml
+  tags:
+   - terraform
+   - packages
+
 # Task: Enable VLAN module
 
 - name: Include kernel module configuration
