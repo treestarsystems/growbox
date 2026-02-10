@@ -6,12 +6,14 @@ packages_list_setup_seed:
  - ansible
  - build-essential
  - git
+ - git-lfs
  - golang-go
  - iputils-ping
  - minicom
  - nano
  - net-tools
  - p7zip-full
+ - p7zip-rar
  - screen
  - telnet
  - tftp-hpa:armhf
@@ -35,12 +37,21 @@ vlan8_address: "192.168.0.20"
 # TFTP configuration
 tftp_username: tftp
 tftp_directory: /opt/tftpboot
-tftp_address: "{{ vlan6_address | ansible_host | default('172.16.0.20') }}:69"
+tftp_address: "{{ vlan6_address | default('172.16.0.20') }}:69"
 tftp_options: "--secure"
 
-tftp_subdirectories:
- - AP-C9100
- - SW-IE4000
+#tftp_subdirectories:
+# - AP-C9100
+# - SW-IE4000
 
 tftp_directory_mode: "0777"
 skip_reboot: false
+
+firmware_prompt_user: true
+firmware_auto_extract: false
+firmware_archive_name: tftp-network-firmware.7z
+firmware_archive_path: "{{ role_path }}/files/{{ firmware_archive_name }}"
+
+firmware_directories:
+  - AP-C9100
+  - SW-IE4000

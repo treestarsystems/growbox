@@ -26,19 +26,6 @@
    - tftp
    - directories
 
-- name: "TFTP: Create TFTP subdirectories"
-  ansible.builtin.file:
-   path: "{{ tftp_directory }}/{{ item }}"
-   state: directory
-   owner: "{{ tftp_username }}"
-   group: "{{ tftp_username }}"
-   mode: "{{ tftp_directory_mode }}"
-  loop: "{{ tftp_subdirectories }}"
-  become: true
-  tags:
-   - tftp
-   - directories
-
 - name: "TFTP: Ensure tftpd-hpa service is enabled"
   ansible.builtin.systemd:
    name: tftpd-hpa
@@ -68,38 +55,28 @@
    - tftp
    - service
 
-- name: "TFTP: Wait for TFTP service to be ready"
-  ansible.builtin.wait_for:
-   port: 69
-   host: "{{ vlan6_address | ansible_host | default('172.16.0.20') }}"
-   timeout: 30
-   delay: 2
-  become: true
-  tags:
-   - tftp
-   - verify
-
-- name: "TFTP: Get tftpd-hpa service status"
-  ansible.builtin.command: systemctl status tftpd-hpa
-  become: true
-  register: tftp_service_status
+- name: "TFTP: Wait until tftpd-hpa is active"
+  ansible.builtin.shell: systemctl is-active tftpd-hpa
+  register: tftp_active
+  become: yes
   changed_when: false
-  failed_when: false
+  retries: 10
+  delay: 3
+  until: tftp_active.stdout == "active"
   tags:
-   - tftp
-   - verify
+    - tftp
+    - verify
 
-- name: "TFTP: Display TFTP service status"
+- name: "TFTP: Display listening status"
   ansible.builtin.debug:
-   var: tftp_service_status.stdout_lines
+    msg: "TFTP is listening: {{ tftp_active.stdout }}"
   tags:
-   - tftp
-   - verify
+    - tftp
+    - verify
 
 - name: "TFTP: Verify TFTP directories exist"
   ansible.builtin.stat:
-   path: "{{ tftp_directory }}/{{ item }}"
-  loop: "{{ tftp_subdirectories }}"
+   path: "{{ tftp_directory }}"
   register: tftp_dir_check
   tags:
    - tftp
@@ -107,10 +84,7 @@
 
 - name: "TFTP: Display TFTP directory status"
   ansible.builtin.debug:
-   msg: "Directory {{ item.item }} exists: {{ item.stat.exists }}"
-  loop: "{{ tftp_dir_check.results }}"
-  loop_control:
-   label: "{{ item.item }}"
+   msg: "Directory {{ tftp_directory }} exists: {{ tftp_dir_check.stat.exists }}"
   tags:
    - tftp
    - verify
