@@ -12,7 +12,7 @@
 - name: "Packages|Terraform: Checking if Required Terraform Version Exists"
   ansible.builtin.set_fact:
    setup_seed_terraform_version_exists: >-
-    {{ setup_seed_terraform_exists_check.stdout is search('Terraform v' + (setup_seed_terraform_version_default | default('1.7.0'))) }}
+    {{ setup_seed_terraform_exists_check.stdout is search('Terraform v' + (setup_seed_terraform_version_default | default('1.14.4'))) }}
   tags:
    - terraform
 
@@ -21,7 +21,7 @@
    - name: "Packages|Terraform: Set download URL based on architecture"
      ansible.builtin.set_fact:
       setup_seed_terraform_arch: "{{ setup_seed_terraform_arch_default | default('arm') }}"
-      setup_seed_terraform_version: "{{ setup_seed_terraform_version_default | default('1.7.0') }}"
+      setup_seed_terraform_version: "{{ setup_seed_terraform_version_default | default('1.14.4') }}"
      tags:
       - terraform
 

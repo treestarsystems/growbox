@@ -57,6 +57,6 @@ setup_seed_firmware_directories:
 
 # Terraform configuration
 setup_seed_terraform_arch_default: "arm" # Leave empty for the default "arm", or specify like "amd64" or "386"
-setup_seed_terraform_version_default: "1.7.0" # Leave empty for latest, or specify like "1.7.0"
+setup_seed_terraform_version_default: "1.14.4" # Leave empty for latest, or specify like "1.14.4"
 setup_seed_terraform_enable_completion: true
 setup_seed_terraform_force_install: false
