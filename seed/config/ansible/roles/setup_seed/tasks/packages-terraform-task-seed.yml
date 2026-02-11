@@ -13,15 +13,14 @@
   ansible.builtin.set_fact:
    setup_seed_terraform_version_exists: >-
     {{ setup_seed_terraform_exists_check.stdout is search('Terraform v' + (setup_seed_terraform_version_default | default('1.7.0'))) }}
-  ansible.builtin.debug:
-   msg: "{{ setup_seed_terraform_version_exists }}"
   tags:
    - terraform
-# - name: "Packages|Terraform: Debugging!!!"
-#   ansible.builtin.debug:
-#    msg: "{{ setup_seed_terraform_exists_check }}"
-#   tags:
-#    - terraform
+
+- name: "Packages|Terraform: Debugging!!!"
+  ansible.builtin.debug:
+   msg: "{{ setup_seed_terraform_exists_check }}"
+  tags:
+   - terraform
 # - name: "Packages|Terraform: Check if Terraform Is Already Installed"
 #   ansible.builtin.stat:
 #    path: /usr/local/bin/terraform
