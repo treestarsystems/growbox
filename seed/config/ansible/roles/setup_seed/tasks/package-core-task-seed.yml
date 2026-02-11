@@ -1,0 +1,28 @@
+# Task: Install packages and configure services for seed setup
+---
+- name: "Apt: Update apt cache"
+  ansible.builtin.apt:
+   update_cache: true
+   cache_valid_time: "{{ setup_seed_apt_cache_valid_time }}"
+  retries: 3
+  delay: 5
+  register: setup_seed_apt_update
+  until: setup_seed_apt_update is success
+  tags:
+   - update
+   - packages
+
+- name: "Apt: Install required packages"
+  ansible.builtin.apt:
+   name: "{{ setup_seed_packages_list }}"
+   state: present
+  retries: 3
+  delay: 5
+  tags:
+   - packages
+
+- name: "Apt: Display installation complete message"
+  ansible.builtin.debug:
+   msg: "All packages have been installed successfully"
+  tags:
+   - packages
