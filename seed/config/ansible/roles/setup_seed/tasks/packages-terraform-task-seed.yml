@@ -39,14 +39,6 @@
      tags:
       - terraform
 
-   - name: "Packages|Terraform: Install unzip"
-     ansible.builtin.apt:
-      name: unzip
-      state: present
-     become: true
-     tags:
-      - terraform
-
    - name: "Packages|Terraform: Download Terraform"
      ansible.builtin.get_url:
       url: "{{ setup_seed_terraform_url | replace(' ', '') }}"

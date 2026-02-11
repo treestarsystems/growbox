@@ -21,6 +21,7 @@ setup_seed_packages_list:
  - tftp-hpa:armhf
  - tftpd-hpa
  - ufw
+ - unzip
  - vlan
  - wget
 
