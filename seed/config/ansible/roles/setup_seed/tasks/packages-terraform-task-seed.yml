@@ -17,6 +17,14 @@
   tags:
    - terraform
 
+- name: "Packages|Terraform: Verify Terraform Installation"
+  ansible.builtin.command: terraform version
+  register: setup_seed_terraform_version_output
+  changed_when: false
+  tags:
+   - terraform
+   - verify
+
 - name: "Packages|Terraform: Display Terraform Version"
   ansible.builtin.debug:
    var: setup_seed_terraform_version_output.stdout_lines
