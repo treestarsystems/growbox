@@ -16,11 +16,94 @@
   tags:
    - terraform
 
-- name: "Packages|Terraform: Debugging!!!"
-  ansible.builtin.debug:
-   msg: "{{ setup_seed_terraform_version_exists }}"
-  tags:
-   - terraform
+- name: "Packages|Terraform: Install Terraform"
+  block:
+   - name: "Packages|Terraform: Set download URL based on architecture"
+     ansible.builtin.set_fact:
+      setup_seed_terraform_arch: "{{ setup_seed_terraform_arch_default | default('arm') }}"
+      setup_seed_terraform_version: "{{ setup_seed_terraform_version_default | default('1.7.0') }}"
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Set download URL"
+     ansible.builtin.set_fact:
+      setup_seed_terraform_url: >-
+       https://releases.hashicorp.com/terraform/{{ setup_seed_terraform_version }}
+       /terraform_{{ setup_seed_terraform_version }}_linux_{{ setup_seed_terraform_arch }}.zip
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Display download URL"
+     ansible.builtin.debug:
+      msg: "Downloading from: {{ setup_seed_terraform_url | replace(' ', '') }}"
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Install unzip"
+     ansible.builtin.apt:
+      name: unzip
+      state: present
+     become: true
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Download Terraform"
+     ansible.builtin.get_url:
+      url: "{{ setup_seed_terraform_url | replace(' ', '') }}"
+      dest: /tmp/terraform.zip
+      mode: "0644"
+     #  when: >
+     #   not setup_seed_terraform_version_exists or
+     #   setup_seed_terraform_force_install | default(false)
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Extract Terraform binary"
+     ansible.builtin.unarchive:
+      src: /tmp/terraform.zip
+      dest: /usr/local/bin
+      remote_src: true
+      mode: "0755"
+     become: true
+     #     when: >
+     #      not setup_seed_terraform_version_exists or
+     #      setup_seed_terraform_force_install | default(false)
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Remove downloaded zip"
+     ansible.builtin.file:
+      path: /tmp/terraform.zip
+      state: absent
+     #     when: >
+     #      not setup_seed_terraform_version_exists or
+     #      setup_seed_terraform_force_install | default(false)
+     tags:
+      - terraform
+
+   - name: "Packages|Terraform: Verify Terraform Installation"
+     ansible.builtin.command: terraform version
+     register: setup_seed_terraform_version_output
+     changed_when: false
+     tags:
+      - terraform
+      - verify
+
+   - name: "Packages|Terraform: Display Terraform Version"
+     ansible.builtin.debug:
+      var: setup_seed_terraform_version_output.stdout_lines
+     tags:
+      - terraform
+      - verify
+  when: >
+   not setup_seed_terraform_version_exists or
+   setup_seed_terraform_force_install | default(false)
+
+# - name: "Packages|Terraform: Debugging!!!"
+#   ansible.builtin.debug:
+#    msg: "{{ setup_seed_terraform_version_exists }}"
+#   tags:
+#    - terraform
 # - name: "Packages|Terraform: Check if Terraform Is Already Installed"
 #   ansible.builtin.stat:
 #    path: /usr/local/bin/terraform
