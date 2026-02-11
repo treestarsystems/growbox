@@ -17,7 +17,7 @@
 
 - name: "VLAN: Create Netplan VLAN configuration"
   ansible.builtin.template:
-   src: netplan-vlans.yaml.j2
+   src: netplan-vlans.yml.j2
    dest: /etc/netplan/growbox-vlans.yaml
    owner: root
    group: root
