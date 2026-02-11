@@ -3,7 +3,7 @@
 # Task: Install packages and configure services for seed setup
 
 - name: Include apt package installation
-  ansible.builtin.include_tasks: system-apt-task-seed.yml
+  ansible.builtin.include_tasks: package-core-task-seed.yml
   tags:
    - packages
 
