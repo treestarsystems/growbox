@@ -1,0 +1,19 @@
+# Task: Install packages and configure services for seed setup
+---
+- name: "Packages|Core: Update Cache and Install Required Packages"
+  package:
+   update_cache: true
+   name: "{{ setup_seed_packages_list }}"
+   state: present
+  retries: 3
+  delay: 5
+  tags:
+   - packages
+   - core
+
+- name: "Packages|Core: Display installation complete message"
+  ansible.builtin.debug:
+   msg: "All packages have been installed successfully"
+  tags:
+   - packages
+   - core

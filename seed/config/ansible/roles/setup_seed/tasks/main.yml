@@ -2,17 +2,18 @@
 ---
 # Task: Install packages and configure services for seed setup
 
-- name: Include apt package installation
-  ansible.builtin.include_tasks: package-core-task-seed.yml
+- name: Include packages core installation
+  ansible.builtin.include_tasks: packages-core-task-seed.yml
   tags:
    - packages
+   - core
 
 # Task: Install terraform package
-- name: Include terraform package installation
-  ansible.builtin.include_tasks: package-terraform-task-seed.yml
+- name: Include packages terraform installation
+  ansible.builtin.include_tasks: packages-terraform-task-seed.yml
   tags:
-   - terraform
    - packages
+   - terraform
 
 # Task: Enable VLAN module
 
