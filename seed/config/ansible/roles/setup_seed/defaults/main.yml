@@ -17,7 +17,6 @@ setup_seed_packages_list:
  - p7zip-full
  - p7zip-rar
  - screen
- #  - software-properties-common
  - telnet
  - tftp-hpa:armhf
  - tftpd-hpa
@@ -40,7 +39,7 @@ setup_seed_vlan8_address: "192.168.0.20"
 # TFTP configuration
 setup_seed_tftp_username: tftp
 setup_seed_tftp_directory: /opt/tftpboot
-setup_seed_tftp_address: "{{ vlan6_address | default('172.16.0.20') }}:69"
+setup_seed_tftp_address: "{{ setup_seed_vlan6_address | default('172.16.0.20') }}:69"
 setup_seed_tftp_options: "--secure"
 
 setup_seed_tftp_directory_mode: "0777"
