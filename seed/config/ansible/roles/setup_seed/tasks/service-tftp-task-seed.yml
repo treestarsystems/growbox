@@ -100,7 +100,7 @@
   become: true
   when:
    - setup_seed_tftp_config.changed
-   - not skip_reboot | bool
+   - not setup_seed_skip_reboot | bool
   tags:
    - reboot
 
@@ -112,7 +112,7 @@
    timeout: 300
   when:
    - setup_seed_tftp_config.changed
-   - not skip_reboot | bool
+   - not setup_seed_skip_reboot | bool
   tags:
    - reboot
 

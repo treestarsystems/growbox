@@ -83,7 +83,7 @@
   register: setup_seed_archive_stat
   delegate_to: localhost
   run_once: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - extract
@@ -112,7 +112,7 @@
 - name: "Firmware: Set archive password"
   ansible.builtin.set_fact:
    setup_seed_archive_password: "{{ setup_seed_archive_password_prompt.user_input }}"
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   no_log: true
   tags:
    - firmware
@@ -124,7 +124,7 @@
    dest: "/tmp/{{ setup_seed_firmware_archive_name }}"
    mode: "0600"
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - extract
@@ -170,7 +170,7 @@
    group: "{{ setup_seed_tftp_username }}"
    recurse: true
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - extract
@@ -183,7 +183,7 @@
    recurse: true
   loop: "{{ setup_seed_firmware_directories }}"
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - extract
@@ -193,7 +193,7 @@
    path: "/tmp/{{ setup_seed_firmware_archive_name }}"
    state: absent
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - extract
@@ -205,7 +205,7 @@
   loop: "{{ setup_seed_firmware_directories }}"
   register: setup_seed_firmware_verify
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - verify
@@ -216,7 +216,7 @@
   loop: "{{ setup_seed_firmware_verify.results }}"
   loop_control:
    label: "{{ item.item }}"
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   tags:
    - firmware
    - verify
@@ -227,7 +227,7 @@
   loop: "{{ setup_seed_firmware_directories }}"
   register: setup_seed_firmware_list
   become: true
-  when: extract_firmware | bool
+  when: setup_seed_extract_firmware | bool
   changed_when: false
   tags:
    - firmware

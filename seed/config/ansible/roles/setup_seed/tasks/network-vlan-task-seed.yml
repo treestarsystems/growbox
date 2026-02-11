@@ -43,9 +43,9 @@
 - name: "VLAN: Bring up VLAN 6 interface"
   ansible.builtin.command: ip link set dev vlan6 up
   become: true
-  when: setup_seed_netplan_config.changed
-  changed_when: false
-  failed_when: false
+#  when: setup_seed_netplan_config.changed
+#  changed_when: false
+#  failed_when: false
   tags:
    - network
    - vlan
