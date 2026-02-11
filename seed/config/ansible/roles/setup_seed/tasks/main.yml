@@ -2,14 +2,14 @@
 ---
 # Task: Install packages and configure services for seed setup
 
-- name: Include packages core installation
+- name: "Task|Packages|Core: Update Cache and Install Required Packages"
   ansible.builtin.include_tasks: packages-core-task-seed.yml
   tags:
    - packages
    - core
 
 # Task: Install terraform package
-- name: Include packages terraform installation
+- name: "Task|Packages|Terraform: Install Terraform Package"
   ansible.builtin.include_tasks: packages-terraform-task-seed.yml
   tags:
    - packages
@@ -17,24 +17,24 @@
 
 # Task: Enable VLAN module
 
-- name: Include kernel module configuration
+- name: "Task|Kernel|VLAN: Include kernel module configuration"
   ansible.builtin.include_tasks: system-kernel-vlan-task-seed.yml
   tags:
    - kernel
 
-- name: Include network configuration
+- name: "Task|Network|VLAN: Include network configuration"
   ansible.builtin.include_tasks: network-vlan-task-seed.yml
   tags:
    - network
 
 # Task: Configure TFTP server
 
-- name: Include TFTP server configuration
+- name: "Task|Service|TFTP: Include TFTP server configuration"
   ansible.builtin.include_tasks: service-tftp-task-seed.yml
   tags:
    - tftp
 
-- name: Include firmware extraction
+- name: "Task|Firmware|Extraction: Include firmware extraction"
   ansible.builtin.include_tasks: firmware-extract-task-seed.yml
   tags:
    - firmware
