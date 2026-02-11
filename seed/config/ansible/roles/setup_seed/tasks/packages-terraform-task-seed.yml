@@ -2,35 +2,50 @@
 # Terraform installation from binary
 
 - name: "Packages|Terraform: Check if Terraform Is Already Installed"
-  ansible.builtin.stat:
-   path: /usr/local/bin/terraform
-  register: setup_seed_terraform_binary
-  tags:
-   - terraform
-
-- name: "Packages|Terraform: Get Current Version If Installed"
-  ansible.builtin.command: /usr/local/bin/terraform version -json
-  register: setup_seed_current_version
-  when: setup_seed_terraform_binary.stat.exists
+  ansible.builtin.command: terraform version
+  register: setup_seed_terraform_exists_check
   changed_when: false
   failed_when: false
   tags:
    - terraform
 
-- name: "Packages|Terraform: Verify Terraform Installation"
-  ansible.builtin.command: terraform version
-  register: setup_seed_terraform_version_output
-  changed_when: false
-  tags:
-   - terraform
-   - verify
-
-- name: "Packages|Terraform: Display Terraform Version"
+- name: "Packages|Terraform: Debugging!!!"
   ansible.builtin.debug:
-   var: setup_seed_terraform_version_output.stdout_lines
+   msg: "{{ setup_seed_terraform_exists_check }}"
   tags:
    - terraform
-   - verify
+# - name: "Packages|Terraform: Check if Terraform Is Already Installed"
+#   ansible.builtin.stat:
+#    path: /usr/local/bin/terraform
+#   register: setup_seed_terraform_binary
+#   tags:
+#    - terraform
+
+# - name: "Packages|Terraform: Get Current Version If Installed"
+#   # ansible.builtin.command: /usr/local/bin/terraform version -json
+#   ansible.builtin.command: /usr/local/bin/terraform version
+#   register: setup_seed_current_version
+#   when: setup_seed_terraform_binary.stat.exists
+#   changed_when: false
+#   failed_when: false
+#   tags:
+#    - terraform
+
+# - name: "Packages|Terraform: Verify Terraform Installation"
+#   ansible.builtin.command: terraform version
+#   register: setup_seed_terraform_version_output
+#   changed_when: false
+#   tags:
+#    - terraform
+#    - verify
+
+# - name: "Packages|Terraform: Display Terraform Version"
+#   ansible.builtin.debug:
+#    var: setup_seed_terraform_version_output.stdout_lines
+#   tags:
+#    - terraform
+#    - verify
+
 # - name: "Packages|Terraform: Set download URL based on architecture"
 #   ansible.builtin.set_fact:
 #    setup_seed_terraform_arch: "{{ setup_seed_terraform_arch_default | default('arm') }}"
