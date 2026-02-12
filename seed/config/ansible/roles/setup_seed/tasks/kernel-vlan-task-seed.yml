@@ -1,18 +1,20 @@
 # Task: Configure VLAN networking
 ---
-- name: "VLAN: Enable 8021q kernel module"
-  ansible.builtin.lineinfile:
-   path: /etc/modules
-   line: "8021q"
-   state: present
-   create: false
+- name: "Kernel|VLAN: Enable 8021q Kernel Module"
+  ansible.builtin.copy:
+   src: 8021q.conf
+   dest: /etc/modules-load.d/
+   force: no
+   owner: root
+   group: root
+   mode: '0644'
   become: true
   tags:
    - kernel
    - vlan
    - network
 
-- name: "VLAN: Load 8021q module"
+- name: "Kernel|VLAN: Load 8021q Module"
   ansible.builtin.command: modprobe 8021q
   become: true
   changed_when: false
@@ -22,11 +24,13 @@
    - vlan
    - network
 
-- name: "VLAN: Verify 8021q module is loaded"
+- name: "Kernel|VLAN: Verify 8021q module is loaded"
   ansible.builtin.shell: set -o pipefail && lsmod | grep 8021q
   register: setup_seed_module_check
   changed_when: false
   failed_when: setup_seed_module_check.rc != 0
   tags:
-   - verify
+   - kernel
    - vlan
+   - network
+   - verify
