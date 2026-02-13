@@ -1,18 +1,52 @@
-# Task: Configure TFTP server
+# Task: Configure VLAN Module
 ---
-- name: "VLAN: Enable 8021q kernel module"
-  ansible.builtin.lineinfile:
-   path: /etc/modules
-   line: "8021q"
-   state: present
-   create: false
-  become: true
+- name: "Network|VLAN: Check Exists - /etc/modules-load.d/8021q.conf"
+  ansible.builtin.stat:
+    path: /etc/modules-load.d/8021q.conf
+  register: setup_seed_config_file_exists_8021q_conf
   tags:
    - kernel
    - vlan
    - network
+   - verify
 
-- name: "VLAN: Load 8021q module"
+- name: "Network|VLAN: Copy - /etc/modules-load.d/8021q.conf"
+  block:
+    - name: "Network|VLAN: Copy template file"
+      ansible.builtin.copy:
+        src: 8021q.conf
+        dest: /etc/modules-load.d/8021q.conf
+        owner: root
+        group: root
+        mode: '0644'
+      become: yes
+      no_log: "{{ not setup_seed_config_file_exists_8021q_conf.stat.exists }}"
+
+  when: not setup_seed_config_file_exists_8021q_conf.stat.exists
+  tags:
+   - kernel
+   - vlan
+   - network
+   - verify
+
+- name: "Network|VLAN: Validate File - /etc/modules-load.d/8021q.conf"
+  block:
+    - name: "Network|VLAN: Ensure required line exists"
+      ansible.builtin.lineinfile:
+        path: /etc/modules-load.d/8021q.conf
+        line: "8021q"
+        state: present
+      become: yes
+      no_log: "{{ not setup_seed_config_file_exists_8021q_conf.stat.exists }}"
+
+  when: setup_seed_config_file_exists_8021q_conf.stat.exists
+  tags:
+   - kernel
+   - vlan
+   - network
+   - verify
+
+- name: "Network|VLAN: Load 8021q Module"
   ansible.builtin.command: modprobe 8021q
   become: true
   changed_when: false
@@ -22,11 +56,13 @@
    - vlan
    - network
 
-- name: "VLAN: Verify 8021q module is loaded"
+- name: "Network|VLAN: Verify 8021q Module Is Loaded"
   ansible.builtin.shell: set -o pipefail && lsmod | grep 8021q
   register: setup_seed_module_check
   changed_when: false
   failed_when: setup_seed_module_check.rc != 0
   tags:
-   - verify
+   - kernel
    - vlan
+   - network
+   - verify
